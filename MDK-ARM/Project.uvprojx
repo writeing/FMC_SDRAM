@@ -361,7 +361,7 @@
             <wLevel>1</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uC99>1</uC99>
             <useXO>0</useXO>
             <v6Lang>1</v6Lang>
             <v6LangP>1</v6LangP>
@@ -369,7 +369,7 @@
               <MiscControls>--C99 --cpu=Cortex-M7.fp.dp</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F769xx,USE_STM32F769I_DISCO,_TARGET_FPU_VFP,ARM_MATH_MATRIX_CHECK,ARM_MATH_ROUNDING,ARM_MATH_CM7,_CC_ARM,_FPU_PRESENT=1,_FPU_USED=1, __FPU_USED=1</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/CMSIS/Device/ST/STM32F7xx/Include;../Drivers/STM32F7xx_HAL_Driver/Inc;../Drivers/BSP/STM32F769I-Discovery;../Drivers/BSP/Components/Common;../Utilities/Log;../Utilities/Fonts;../Utilities/CPU;..\Src</IncludePath>
+              <IncludePath>../Inc;../Drivers/CMSIS/Device/ST/STM32F7xx/Include;../Drivers/STM32F7xx_HAL_Driver/Inc;../Drivers/BSP/STM32F769I-Discovery;../Drivers/BSP/Components/Common;../Utilities/Log;../Utilities/Fonts;../Utilities/CPU;..\Src;..\Src\websocket;..\Src\network</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -706,6 +706,36 @@
               <FileName>Ublox.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\Ublox.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Websocket</GroupName>
+          <Files>
+            <File>
+              <FileName>util.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\websocket\util.c</FilePath>
+            </File>
+            <File>
+              <FileName>websocket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\websocket\websocket.c</FilePath>
+            </File>
+            <File>
+              <FileName>websocketLib.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\websocket\websocketLib.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>network</GroupName>
+          <Files>
+            <File>
+              <FileName>LTE4G.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\network\LTE4G.c</FilePath>
             </File>
           </Files>
         </Group>

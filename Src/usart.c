@@ -41,6 +41,14 @@ void FIFO_UbloxUartIRQ(int index)
 {
     FIFO_UartIRQ(&gFIFO_Uart[index]);
 }
+
+
+
+int fputc(int ch, FILE *f)
+{      
+	UsartSendData(&Huart[2],ch);
+	return ch;
+}
 //////////////////////////////////////////////////////////////////////////
 ////////////////////////////////³õÊ¼»¯´®¿Ú////////////////////////////////
 ////////////////////////////////////////////////////////////////////////// 
@@ -189,8 +197,8 @@ void UartRecvIntCmd( UART_HandleTypeDef *ptUart  )
 					break;
 				case JIYI:
 				case ZEROTECH:
-					UartInit(&Uart1Handle,1,38400);
-					UartInit(&Uart6Handle,6,38400);
+					UartInit(&Uart1Handle,1,115200);
+					UartInit(&Uart6Handle,6,115200);
 					break;
 				default:
 					break;

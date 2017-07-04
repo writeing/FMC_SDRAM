@@ -889,6 +889,7 @@ static int sync_ubx(unsigned char *buff, unsigned char data)
 *          -TADJ=tint : adjust time tags to multiples of tint (sec)
 *
 *-----------------------------------------------------------------------------*/
+int flag = 0;
 extern int input_ubx(raw_t *raw, unsigned char data,unsigned short usFlag)
 {
     //trace(5,"input_ubx: data=%02x\n",data);
@@ -897,7 +898,7 @@ extern int input_ubx(raw_t *raw, unsigned char data,unsigned short usFlag)
     if (raw->nbyte==0) {
         if (!sync_ubx(raw->buff,data)) return 0;
         raw->nbyte=2;
-
+				flag = HAL_GetTick();
         return 0;
     }
     raw->buff[raw->nbyte++]=data; 
@@ -915,7 +916,8 @@ extern int input_ubx(raw_t *raw, unsigned char data,unsigned short usFlag)
     raw->nbyte=0;
   
     /* decode ublox raw message */
-    
+    printf("time = %d\r\n",HAL_GetTick()-flag);
+		printf("len = %d\r\n",raw->len);
     /* decode ublox raw message */
     return decode_ubx(raw,usFlag);
 }

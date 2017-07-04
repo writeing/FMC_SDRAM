@@ -54,7 +54,7 @@ U8 RtkUart_UBLOX_ReadHandler()
 			{
 				if(g_usRawRoverFlag == 1 )
 				{				
-					processRtk();
+					//processRtk();
 				}
 			}
 		}
@@ -95,7 +95,7 @@ void icegpsMain()
 //#if 1
 //    RtkUart_2_Init(UART_BAUD_9600);	
 	SetUblox();	
-	UartSetBaudRate(&Huart[UBLOX],230400);
+	UartSetBaudRate(&Huart[UBLOX],115200);
     g_ucStationType 						= g_tBasePose.uiStationType;
 	//g_tBasePose.uiUserSetFlag  	= 0;  //上电默认为用户未设置基准站坐标
 	g_tBasePose.uiPosFilterFlag = 0;  //上电默认基准站滤波坐标无效

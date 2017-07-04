@@ -281,8 +281,8 @@ void USART3_IRQHandler(void)
   */
 void USART6_IRQHandler(void)
 {
+	NVIC_SystemReset();
 	FIFO_UbloxUartIRQ(HUART6);
-
 }
 
 void UART7_IRQHandler(void)

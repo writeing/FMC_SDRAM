@@ -901,12 +901,12 @@ typedef struct {        /* rinex control struct type */
     char   opt[256];    /* rinex dependent options */
 } rnxctr_t;
 
-//typedef struct {        /* download url type */
-//    char type[32];      /* data type */
-//    char path[1024];    /* url path */
-//    char dir [1024];    /* local directory */
-//    double tint;        /* time interval (s) */
-//} url_t;
+typedef struct {        /* download url type */
+    char type[32];      /* data type */
+    char path[1024];    /* url path */
+    char dir [1024];    /* local directory */
+    double tint;        /* time interval (s) */
+} url_t;
 
 typedef struct {        /* option type */
     char *name;         /* option name */

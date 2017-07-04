@@ -33,7 +33,7 @@ typedef struct
     uint8_t initDoneFlag;      /* 初始化完成标志 */
 } UART_FIFO_Typedef_t;
 
-extern void UartSendByte(UART_HandleTypeDef *huart, uint8_t ucByte);
+extern HAL_StatusTypeDef UartSendByte(UART_HandleTypeDef *huart, uint8_t ucByte);
 extern void UartSendBuffer(UART_HandleTypeDef *huart, uint8_t *ucBuffer, uint16_t usLength);
 extern HAL_StatusTypeDef UartReadByte(UART_HandleTypeDef *huart, uint8_t *ucByte);
 extern HAL_StatusTypeDef UartSetBaudRate(UART_HandleTypeDef *huart, uint32_t baudRate);

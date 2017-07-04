@@ -7,6 +7,8 @@
 #include "spb.h"
 #include "iUblox.h"
 #include "imain.h"
+#include "LTE4G.h"
+#include <websocket.h>
 /* Exported macro ------------------------------------------------------------*/
 #define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
 
@@ -69,7 +71,7 @@ int main(void)
 		/* Usart initialization */
 	/* BASE的usart1对外发送坐标；BASE的usart2接收外部指令；BASE的usart3接收GNSS数据，并转发到usart1；BASE的usart6不接收数据*/
 	/* ROVER的usart1接收BASE的usart1的数据；ROVER的usart2不接收指令；ROVER的usart7接收GNSS数据；ROVER的usart6不接收数据*/
-	UartInit(&Uart1Handle,1,57600);
+	UartInit(&Uart1Handle,1,115200);
 	UartInit(&Uart7Handle,3,115200);
 	UartInit(&Uart6Handle,6,115200);
 	UartInit(&Uart7Handle,7,9600);
@@ -84,13 +86,50 @@ int main(void)
 	HAL_Delay(200);
 	/* check sdram */
 	unsigned char ch;
-	while(1)
-	{
-		
-  /* RTK MAIN initialization */
-	  RtkUart_1_ReadHandler();
-	  RtkUart_UBLOX_ReadHandler();		
+	HAL_Delay(20);
+	//UartSendBuffer(&Huart[2],"connect adadas\r\n",20);
+	printf("connect server\r\n");
+	//int fd = socket(1);
+	//connect(fd,"47.94.18.132",9601,20);
+	//char rev_buf[1024];	
+	char buff[1024] = {0};
+	wsContext_t *ctx = NULL;
+	ctx = wsContextNew();
+	wsCreateConnection(ctx, "ws://47.94.18.132:1234");	
+	int i = 1;
+	char s[512] = {"hello websocketdasdasdasdsadddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddhello websocketdasdasdasdsadddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddhello websocketdasdasdasdsadddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddhello\r\n"};	
+	while(i)
+	{		
+		sendUtf8Data(ctx, s, strlen(s));
+		int len = recvData(ctx, buff, 1024);
+		printf("recv = %d\r\n", strlen(buff));
+		if (len)
+		{
+			printf("recv ok %d\n", len);			
+		}
+		if (len < 0)
+		{
+			printf("len < 0recv = %s\r\n", buff);
+			//break;
+		}
+		HAL_Delay(100);
 	}
+	
+	wsContextFree(ctx);
+	return 0;
+//	while(1)
+//	{
+//		
+		//printf("connect server\r\n");
+	//	send(fd,"hello world m7",30, 0);
+	//	HAL_Delay(200);
+//		recv(fd, rev_buf,1024, 0);
+		//printf("rev_buf = \r\n");
+//		HAL_Delay(200);
+  /* RTK MAIN initialization */
+	  //RtkUart_1_ReadHandler();
+	  //RtkUart_UBLOX_ReadHandler();		
+//	}
 }
 
 

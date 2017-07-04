@@ -9,11 +9,23 @@
 * 返 回 值: 无
 * 说    明: 无
 **/
-void UartSendByte(UART_HandleTypeDef *huart, uint8_t ucByte)
+//void UartSendByte(UART_HandleTypeDef *huart, uint8_t ucByte)
+//{
+//    huart->Instance->TDR = (ucByte & (uint8_t)0xFF);
+//    while (__HAL_UART_GET_FLAG(huart, UART_FLAG_TXE) == RESET)
+//    {
+//    }
+//}
+HAL_StatusTypeDef UartSendByte(UART_HandleTypeDef *huart, uint8_t ucByte)
 {
-    huart->Instance->TDR = (ucByte & (uint8_t)0xFF);
-    while (__HAL_UART_GET_FLAG(huart, UART_FLAG_TXE) == RESET)
+    if (__HAL_UART_GET_FLAG(huart, UART_FLAG_TXE))
     {
+        huart->Instance->TDR = (ucByte & (uint8_t)0x00FF);
+        return HAL_OK;
+    }
+    else
+    {
+        return HAL_ERROR;
     }
 }
 
@@ -31,7 +43,9 @@ void UartSendBuffer(UART_HandleTypeDef *huart, uint8_t *ucBuffer, uint16_t usLen
 
     for (i = 0; i < usLen; i++)
     {
-        UartSendByte(huart, ucBuffer[i]);
+        while (UartSendByte(huart, ucBuffer[i]))
+        {
+        }
     }
 }
 
@@ -209,8 +223,7 @@ HAL_StatusTypeDef FIFO_UartReadByte(UART_FIFO_Typedef_t *pFIFO_Uart, uint8_t *uc
 **/
 uint16_t FIFO_UartReadBuffer(UART_FIFO_Typedef_t *pFIFO_Uart, uint8_t *ucBuffer, uint16_t usLen)
 {
-    uint16_t i;
-
+    uint16_t i;		
     for (i = 0; i < usLen; i++)
     {
         if (FIFO_UartReadByte(pFIFO_Uart, ucBuffer + i) == HAL_ERROR)
@@ -338,12 +351,14 @@ void FIFO_UartIRQ(UART_FIFO_Typedef_t *pFIFO_Uart)
         {
             /* 从发送FIFO取1个字节写入串口发送数据寄存器 */
             // HAL_UART_Transmit(pFIFO_Uart->huart, &(pFIFO_Uart->pTxBuf[pFIFO_Uart->usTxRead]),1,0xff);
-            UartSendByte(pFIFO_Uart->huart, pFIFO_Uart->pTxBuf[pFIFO_Uart->usTxRead]);
-            if (++pFIFO_Uart->usTxRead >= pFIFO_Uart->usTxBufSize)
+            if (UartSendByte(pFIFO_Uart->huart, pFIFO_Uart->pTxBuf[pFIFO_Uart->usTxRead]) == HAL_OK)
             {
-                pFIFO_Uart->usTxRead = 0;
+                if (++pFIFO_Uart->usTxRead >= pFIFO_Uart->usTxBufSize)
+                {
+                    pFIFO_Uart->usTxRead = 0;
+                }
+                pFIFO_Uart->usTxCount--;
             }
-            pFIFO_Uart->usTxCount--;
         }
     }
     /* 数据bit位全部发送完毕的中断 */
@@ -364,12 +379,14 @@ void FIFO_UartIRQ(UART_FIFO_Typedef_t *pFIFO_Uart)
             /* 正常情况下，不会进入此分支 */
             /* 如果发送FIFO的数据还未完毕，则从发送FIFO取1个数据写入发送数据寄存器 */
             // HAL_UART_Transmit(pFIFO_Uart->huart, &(pFIFO_Uart->pTxBuf[pFIFO_Uart->usTxRead]),1,0xff);
-            UartSendByte(pFIFO_Uart->huart, pFIFO_Uart->pTxBuf[pFIFO_Uart->usTxRead]);
-            if (++pFIFO_Uart->usTxRead >= pFIFO_Uart->usTxBufSize)
+            if (UartSendByte(pFIFO_Uart->huart, pFIFO_Uart->pTxBuf[pFIFO_Uart->usTxRead]) == HAL_OK)
             {
-                pFIFO_Uart->usTxRead = 0;
+                if (++pFIFO_Uart->usTxRead >= pFIFO_Uart->usTxBufSize)
+                {
+                    pFIFO_Uart->usTxRead = 0;
+                }
+                pFIFO_Uart->usTxCount--;
             }
-            pFIFO_Uart->usTxCount--;
         }
     }
 }

@@ -26,7 +26,8 @@
 #include <math.h>
 #include "Global.h"
 #include <string.h>
-
+#include <stdio.h>
+#include "main.h"
 extern nav_t nav;
 
 #define UBXSYNC1    0xB5        /* ubx message sync code 1 */
@@ -258,7 +259,7 @@ static int decode_rxmraw(raw_t *raw)
     raw->obs.n=n;
     return 1;
 }
-
+extern void ProcessUartTask(void);
 /* decode ubx-rxm-rawx: multi-gnss raw measurement data (ref [3]) ------------*/
 static int decode_rxmrawx(raw_t *raw,unsigned short usFlag)
 {
@@ -267,22 +268,22 @@ static int decode_rxmrawx(raw_t *raw,unsigned short usFlag)
     int i,j,sys,prn,sat,fcn,n=0,nsat,week,tstat,lockt,halfc;
     unsigned char *p=raw->buff+6,*q;
     //trace(4,"decode_rxmrawx: len=%d\n",raw->len);
-    
+		if(g_tBasePose.uiStationType == 0)
+		{
+			sendBinary(ctx, raw->buff, raw->len );
+			return 0;
+		}
     if (raw->outtype) {
         sprintf(raw->msgtype,"UBX RXM-RAWX  (%4d): nsat=%d",raw->len,U1(p+11));
     }
-		//printf("nsat = %d\r\n",nsat);
-    nsat=U1(p+11);
-		//printf("p address = %p\r\n",p);
-		//printf("raw->len = %d\r\n",raw->len);
+		
+    nsat=U1(p+11);		
     if (raw->len < (24+32*nsat)) {
         //trace(2,"ubx rxmrawx length error: len=%d nsat=%d\n",raw->len,nsat);
         //LogStr("ubx rxmrawx length error: len=%d nsat=%d\n",raw->len,nsat);	
         return -1;
-    }		
-	//	printf("tow0 = %lf\r\n",tow0);
-    tow0=R8(p);
-	//	printf("tow0 = %lf\r\n",tow0);
+    }			
+    tow0=R8(p);	
     week=U2(p+8);
     tow=ROUND(tow0/0.1)*0.1; /* round by 100 ms */
     time=gpst2time(week,tow);
@@ -398,40 +399,35 @@ static int decode_view_rtk(raw_t *raw)
 }
 
 /* decode ublox POSECEF: Position Solution in ECEF --------------------------------*/
+extern void SendBasePos( UART_HandleTypeDef *huart );
 static int decode_rxposecef(raw_t *raw)
 {
-    gtime_t time;
+  gtime_t time;
 	double dPosAcc;
-    unsigned char *p=raw->buff+6;
+  unsigned char *p=raw->buff+6;
 	char *q;
-    double tow,dPos[3];
-	static unsigned char ucFilterCnt = 0; 
-	
-    
-    //trace(4,"decode_rxmraw: len=%d\n",raw->len);
-    
-    
-    tow  = U4(p  );
+  double tow,dPos[3];
+	static unsigned char ucFilterCnt = 0;     
+    //trace(4,"decode_rxmraw: len=%d\n",raw->len);       
+  tow  = U4(p);
     //dPos[0] = (double)getbits(p, 32, 32)*0.01;
     //dPos[1] = (double)getbits(p, 64, 32)*0.01;
 	//dPos[2] = (double)getbits(p, 96, 32)*0.01;
 	
 	dPos[0] = (int)U4(p+4)*0.01;
-    dPos[1] = (int)U4(p+8)*0.01;
-	dPos[2] = (int)U4(p+12)*0.01;
-	
-	dPosAcc = (int)U4(p+16)*0.01;;
-
-	if((dPosAcc<3.0))//&& (ucFilterCnt<20))
+  dPos[1] = (int)U4(p+8)*0.01;
+	dPos[2] = (int)U4(p+12)*0.01;	
+	dPosAcc = (int)U4(p+16)*0.01;
+	printf("acc = %lf\r\n",dPosAcc);
+	if((dPosAcc<3.5))//&& (ucFilterCnt<20))
 	{
 		//if(ucFilterCnt==0)
-		{
-			g_tBasePose.dFilterX = dPos[0];
-			g_tBasePose.dFilterY = dPos[1];
-			g_tBasePose.dFilterZ = dPos[2];	
-      g_tBasePose.uiPosFilterFlag = 1;
-            		            
-		}
+		g_tBasePose.dFilterX = dPos[0];
+		g_tBasePose.dFilterY = dPos[1];
+		g_tBasePose.dFilterZ = dPos[2];	
+		g_tBasePose.uiPosFilterFlag = 1;   	
+		SendBasePos(&Uart6Handle);
+		
 		/*else
 		{
 			g_tBasePose.dFilterX = (g_tBasePose.dFilterX*ucFilterCnt + dPos[0])/(ucFilterCnt+1);
@@ -446,10 +442,10 @@ static int decode_rxposecef(raw_t *raw)
             ucFilterCnt=1;
 		}*/
 	}
-    else if (dPosAcc > 6.0)
-    {
-        g_tBasePose.uiPosFilterFlag = 0;
-    }
+//    else if (dPosAcc > 6.0)
+//    {
+//        g_tBasePose.uiPosFilterFlag = 0;
+//    }
          
     return 1;
 }
@@ -834,6 +830,7 @@ extern int decode_ubx(raw_t *raw,unsigned short usFlag)
         //LogStr("checksum ubx checksum error: type=%04x len=%d\n",type,raw->len);
         return -1;
     }
+	printf("type = %d\r\n",type);
     if(g_tBasePose.uiStationType == 1)
     {
         switch (type) 
@@ -843,21 +840,22 @@ extern int decode_ubx(raw_t *raw,unsigned short usFlag)
 		    //case ID_RXMSFRB : return decode_rxmsfrb (raw);
 		    case ID_RXMSFRBX: return decode_rxmsfrbx(raw);
 		    case ID_POSBASE : return decode_base_pos(raw);
-            case ID_VIEW_RTK :  return decode_view_rtk(raw);				
+        case ID_VIEW_RTK :  return decode_view_rtk(raw);				
 		    //case ID_POSECEF : return decode_rxposecef(raw);
-            //case ID_NAVSOL  : return decode_navsol  (raw);
-            //case ID_NAVTIME : return decode_navtime (raw);
-            //case ID_TRKMEAS : return decode_trkmeas (raw);
-            //case ID_TRKD5   : return decode_trkd5   (raw);
-            //case ID_TRKSFRBX: return decode_trksfrbx(raw);
-        }    		
+				//case ID_NAVSOL  : return decode_navsol  (raw);
+				//case ID_NAVTIME : return decode_navtime (raw);
+				//case ID_TRKMEAS : return decode_trkmeas (raw);
+				//case ID_TRKD5   : return decode_trkd5   (raw);
+				//case ID_TRKSFRBX: return decode_trksfrbx(raw);
+        }
     }
     else
     {
          switch (type) 
             {				
 				case ID_POSECEF : return decode_rxposecef(raw);
-                case ID_VIEW_RTK: return decode_view_rtk(raw);
+        case ID_VIEW_RTK: return decode_view_rtk(raw);
+				case ID_RXMRAWX : return decode_rxmrawx (raw,usFlag);
             }         
     }
 
@@ -897,8 +895,7 @@ extern int input_ubx(raw_t *raw, unsigned char data,unsigned short usFlag)
     /* synchronize frame */
     if (raw->nbyte==0) {
         if (!sync_ubx(raw->buff,data)) return 0;
-        raw->nbyte=2;
-				flag = HAL_GetTick();
+        raw->nbyte=2;;
         return 0;
     }
     raw->buff[raw->nbyte++]=data; 
@@ -916,8 +913,6 @@ extern int input_ubx(raw_t *raw, unsigned char data,unsigned short usFlag)
     raw->nbyte=0;
   
     /* decode ublox raw message */
-    printf("time = %d\r\n",HAL_GetTick()-flag);
-		printf("len = %d\r\n",raw->len);
     /* decode ublox raw message */
     return decode_ubx(raw,usFlag);
 }

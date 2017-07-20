@@ -397,6 +397,7 @@ int32_t ut_connect(const char *hostname, uint16_t port)
     //int iret = _get_addr_by_hostname(AF_INET, SOCK_STREAM, hostname, port, &addr_remote, &addr_len);
 //    if (iret >= 0)
 //    {
+			printf("hostname %s\r\n",hostname);
 	    if (connect(fd,hostname,port , addr_len) < 0)
 	    {
 	        perror("connect:");

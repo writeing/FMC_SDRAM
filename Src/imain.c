@@ -53,8 +53,9 @@ U8 RtkUart_UBLOX_ReadHandler()
 			if(g_tBasePose.uiStationType == 1)
 			{
 				if(g_usRawRoverFlag == 1 )
-				{				
-					//processRtk();
+				{		
+					
+					processRtk();
 				}
 			}
 		}
@@ -94,6 +95,8 @@ void icegpsMain()
 	gInitDoneFlag=1;
 //#if 1
 //    RtkUart_2_Init(UART_BAUD_9600);	
+	g_tBasePose.uiStationType = 0;// 强制设置为流动站   0 :jizhan   1 : liudongzhan
+	g_ucStationType 						= 0;// 强制设置为流动站   0 :jizhan   1 : liudongzhan
 	SetUblox();	
 	UartSetBaudRate(&Huart[UBLOX],115200);
     g_ucStationType 						= g_tBasePose.uiStationType;
@@ -103,10 +106,10 @@ void icegpsMain()
 	g_tBasePose.dFilterY 				= 0.0;
 	g_tBasePose.dFilterZ 				= 0.0;
 	
-	g_ucStationType 						= 1;// 强制设置为流动站
+	
 
 	g_usInitCompelet = 1;
-	g_tBasePose.uiStationType = 1;
+	
 
 }
 /**
@@ -273,17 +276,19 @@ void processRtk(void)
 }
 void ProcessUartTask(void)
 {
-	if( g_usPpsInt !=1 )
-		return;
+//	if( g_usPpsInt !=1 )
+//		return;
+//	
+//	if( fabs(HAL_GetTick()-g_uiPpsTic)<10 )
+//		return;
+//	
+//	g_usPpsInt	= 0;
 	
-	if( fabs(HAL_GetTick()-g_uiPpsTic)<10 )
-		return;
-	
-	g_usPpsInt	= 0;
-	
-	SendBasePos(&Uart1Handle);	
+	//SendBasePos(&Uart1Handle);	
 	// SendBasePos(&Uart2Handle);	
+	printf("send base pos\r\n");
 	SendBasePos(&Uart6Handle);	
+	
 }
 
 

@@ -86,16 +86,16 @@ void SetUbloxDataWithStation()
 	char g_cRxmSFR_Open[16]    		= {0xB5,0x62,0x06,0x01,0x08,0x00,0x02,0x13,0x00,0x01,0x00,0x00,0x00,0x00,0x25,0x3D};
 	char g_cRxmSFR_Close[16]   		= {0xB5,0x62,0x06,0x01,0x08,0x00,0x02,0x13,0x00,0x00,0x00,0x00,0x00,0x00,0x24,0x38};
 
-//	if(g_tBasePose.uiStationType == 0)
-//	{
-//		UartSendBuffer(&gUartDatPort_2, g_cNAVPOSECEF_Open, sizeof(g_cNAVPOSECEF_Open));
-//		kal_sleep_task(2);
-//		UartSendBuffer(&gUartDatPort_2, g_cRAWX_OPEN, sizeof(g_cRAWX_OPEN));
-//		kal_sleep_task(2);
-//		UartSendBuffer(&gUartDatPort_2, g_cRxmSFR_Close, sizeof(g_cRxmSFR_Close));
-//		kal_sleep_task(2);
-//	}
-//	else if(g_tBasePose.uiStationType == 1)
+	if(g_ucStationType == 0)
+	{
+		UartSendBuffer(&gUartDatPort_2, g_cNAVPOSECEF_Open, sizeof(g_cNAVPOSECEF_Open));
+		kal_sleep_task(2);
+		UartSendBuffer(&gUartDatPort_2, g_cRAWX_OPEN, sizeof(g_cRAWX_OPEN));
+		kal_sleep_task(2);
+		UartSendBuffer(&gUartDatPort_2, g_cRxmSFR_Close, sizeof(g_cRxmSFR_Close));
+		kal_sleep_task(2);
+	}
+	else if(g_ucStationType == 1)
 	{
 		UartSendBuffer(&gUartDatPort_2, g_cNAVPOSECEF_Close, sizeof(g_cNAVPOSECEF_Close));
 		kal_sleep_task(2);
@@ -165,7 +165,7 @@ void SetUbloxRate()
 	char g_cRATE_10HZ[14] 	= {0xB5,0x62,0x06,0x08,0x06,0x00,0x64,0x00,0x01,0x00,0x01,0x00,0x7A,0x12};
 	char g_cRATE_10HZ2[14] 	= {0xB5,0x62,0x06,0x08,0x06,0x00,0x64,0x00,0x02,0x00,0x01,0x00,0x7B,0x16};
 
-	switch (RATE_5HZ)
+	switch (RATE_1HZ)
 	{
 		case RATE_1HZ:
 			UartSendBuffer(&gUartDatPort_2, g_cRATE_1HZ, sizeof(g_cRATE_1HZ));	

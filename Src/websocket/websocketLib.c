@@ -45,7 +45,6 @@ static int32_t _validate_headers(int32_t fd, char *key)
     char base64str[256] = {0};
     int32_t base64_len = 0;
     uint8_t sha1[20] = {0};
-		//printf("websocketlib.c:51\t\n");
     if (_recv_line(fd, buff) < 0)
     {
 					
@@ -105,7 +104,7 @@ static int32_t _handshake(int32_t fd, const char *host, unsigned short port, con
 {
     int offset = 0;
     char header_str[512] = {0};
-		HAL_Delay(5000);
+		HAL_Delay(5000);		
     offset += sprintf(header_str + offset, "GET %s HTTP/1.1\r\n", resource);
     offset += sprintf(header_str + offset, "Upgrade: websocket\r\n");
     offset += sprintf(header_str + offset, "Connection: Upgrade\r\n");

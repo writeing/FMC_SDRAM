@@ -67,12 +67,17 @@ int connect(int fd,const char *hostname,int port,int addr_len)
 	memset(buff,'\0',1024);
 	HAL_Delay(1000);
 	while(FIFO_UartReadBuffer(&gFIFO_Uart[0],buff,1024) == 0);
-	if(strstr((char *)buff,"connect"))
+	printf("recv = %s\r\n",buff);
+//	while(FIFO_UartReadBuffer(&gFIFO_Uart[0],buff,1024) == 0);
+//	printf("recv = %s\r\n",buff);
+	if(strstr((char *)buff,"CONNECT"))
 	{
+		printf("CONNECT ok\r\n");
 		return OK;
 	}
 	else
 	{
+		printf("CONNECT error\r\n");
 		return ERROR;
 	}
 }

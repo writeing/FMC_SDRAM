@@ -8,7 +8,6 @@
 #include "iUblox.h"
 #include "imain.h"
 #include "LTE4G.h"
-#include <websocket.h>
 /* Exported macro ------------------------------------------------------------*/
 #define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
 
@@ -30,7 +29,7 @@ SDRAM_HandleTypeDef      	hsdram;
 FMC_SDRAM_TimingTypeDef  	SDRAM_Timing;
 FMC_SDRAM_CommandTypeDef 	command;
 
-
+wsContext_t *ctx = NULL;
 /* Private function prototypes -----------------------------------------------*/
 
 /**
@@ -93,28 +92,30 @@ int main(void)
 	//connect(fd,"47.94.18.132",9601,20);
 	//char rev_buf[1024];	
 	char buff[1024] = {0};
-	wsContext_t *ctx = NULL;
+	
 	ctx = wsContextNew();
-	wsCreateConnection(ctx, "ws://47.94.18.132:1234");	
+	wsCreateConnection(ctx, "ws://47.94.18.132:10000");	
 	int i = 1;
-	char s[512] = {"hello websocketdasdasdasdsadddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddhello websocketdasdasdasdsadddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddhello websocketdasdasdasdsadddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddhello\r\n"};	
+	char s[1024];// = {"aaa"};	
 	while(i)
 	{		
-		sendUtf8Data(ctx, s, strlen(s));
-		int len = recvData(ctx, buff, 1024);
-		printf("recv = %d\r\n", strlen(buff));
-		if (len)
-		{
-			printf("recv ok %d\n", len);			
-		}
-		if (len < 0)
-		{
-			printf("len < 0recv = %s\r\n", buff);
-			//break;
-		}
-		HAL_Delay(100);
-	}
-	
+		//FIFO_UartReadBuffer(&gFIFO_Uart[3],(uint8_t *)s,1024);
+		//sendUtf8Data(ctx, s, strlen(s));
+		//int len = recvData(ctx, buff, 1024);
+		//printf("recv = %s\r\n", buff);
+//		if (len)
+//		{
+//			printf("recv ok %d\n", len);			
+//		}
+//		if (len < 0)
+//		{
+//			printf("len < 0recv = %s\r\n", buff);
+//			//break;
+//		}
+		RtkUart_1_ReadHandler();
+	  RtkUart_UBLOX_ReadHandler();
+		//HAL_Delay(100);
+	}	
 	wsContextFree(ctx);
 	return 0;
 //	while(1)
@@ -127,8 +128,7 @@ int main(void)
 		//printf("rev_buf = \r\n");
 //		HAL_Delay(200);
   /* RTK MAIN initialization */
-	  //RtkUart_1_ReadHandler();
-	  //RtkUart_UBLOX_ReadHandler();		
+		
 //	}
 }
 

@@ -43,7 +43,7 @@
 #include "stm32f7xx_hal.h"
 #include "stm32f769i_discovery.h"
 #include "stm32f7xx_lp_modes.h"
-
+#include <websocket.h>
 #define RTC_ASYNCH_PREDIV    0x7F
 #define RTC_SYNCH_PREDIV     0x0130
 
@@ -274,6 +274,8 @@ typedef unsigned int            kal_uint32;
 /* portable 32-bit signed integer */
 typedef int              kal_int32;
 
+
+extern wsContext_t *ctx;
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

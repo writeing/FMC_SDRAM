@@ -280,7 +280,7 @@ void USART3_IRQHandler(void)
   *         used for USART data reception
   */
 void USART6_IRQHandler(void)
-{
+{	
 	NVIC_SystemReset();
 	FIFO_UbloxUartIRQ(HUART6);
 }

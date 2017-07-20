@@ -1082,29 +1082,27 @@ void SendBasePos( UART_HandleTypeDef *huart )
 	// length
 	q+=2;
 	
-	// 已经设置基准站坐标
+	// 已经设置基准站坐标   按键
 	if(g_tBasePose.uiUserSetFlag==1)
 	{
-		setI4(q,(int)(g_tBasePose.dUserSetX*100)); q+=4;
-		setI4(q,(int)(g_tBasePose.dUserSetY*100)); q+=4;
-		setI4(q,(int)(g_tBasePose.dUserSetZ*100)); q+=4;
+		setR8(q,(int)(g_tBasePose.dUserSetX)); q+=8;
+		setR8(q,(int)(g_tBasePose.dUserSetY)); q+=8;
+		setR8(q,(int)(g_tBasePose.dUserSetZ)); q+=8;
 	}
 	// 滤波获取基准站坐标
-	else if(g_tBasePose.uiPosFilterFlag==1)
-	{
-		setI4(q,(int)(g_tBasePose.dFilterX*100)); q+=4;
-		setI4(q,(int)(g_tBasePose.dFilterY*100)); q+=4;
-		setI4(q,(int)(g_tBasePose.dFilterZ*100)); q+=4;
-	}
 	else
 	{
-		return;
+		setR8(q,(int)(g_tBasePose.dFilterX)); q+=8;
+		setR8(q,(int)(g_tBasePose.dFilterY));q+=8;
+		setR8(q,(int)(g_tBasePose.dFilterZ)); q+=8;
 	}
 	n=(int)(q-g_cSendBuf)+2;    
 	setU2(g_cSendBuf+4,(unsigned short)(n-8));
 	setcs(g_cSendBuf,n);
-
-	UartSend(huart, g_cSendBuf, n);
+	sendBinary(ctx, g_cSendBuf, n);
+	//UartSend(huart, g_cSendBuf, n);
+	printf("%lf,%lf,%lf\r\n",g_tBasePose.dFilterX,g_tBasePose.dFilterY,g_tBasePose.dFilterZ);
+	//FIFO_UartSendBuffer(&gFIFO_Uart[2],(uint8_t *)g_cSendBuf,n);
 }
 
 //////////////////////////////////////////////////////////////////////////
